@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _scraper = WebScrapingService();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _rememberMe = true;
 
   Future<void> _login() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -31,11 +32,16 @@ class _LoginScreenState extends State<LoginScreen> {
         final username = _usernameController.text;
         final password = _passwordController.text;
 
-        // Attempt to fetch data to verify credentials
-        await _scraper.getAttendance(username, password);
+        // --- FIXED ---
+        // Changed the method call from the old 'getAttendance' to the new 'getScrapedData'.
+        // This is just to verify the credentials are correct before proceeding.
+        await _scraper.getScrapedData(username, password);
 
-        // If successful, save credentials
-        await _storage.saveCredentials(username, password);
+        if (_rememberMe) {
+          await _storage.saveCredentials(username, password);
+        } else {
+          await _storage.deleteCredentials();
+        }
 
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -47,9 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
           _errorMessage = e.toString().replaceFirst('Exception: ', '');
         });
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -105,7 +113,35 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) => value!.isEmpty ? 'Please enter your password' : null,
                       style: const TextStyle(color: Colors.white),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _rememberMe = value ?? true;
+                            });
+                          },
+                          checkColor: Colors.black,
+                          activeColor: Colors.white,
+                          side: const BorderSide(color: Colors.white70),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _rememberMe = !_rememberMe;
+                            });
+                          },
+                          child: const Text(
+                            'Remember Me',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
                     if (_errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),

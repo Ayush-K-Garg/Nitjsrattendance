@@ -28,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _logout() async {
     // Clear credentials and cache
-    await SecureStorageService().clearCredentials();
+    // --- FIXED ---
+    // Changed clearCredentials() to deleteCredentials() to match the service file.
+    await SecureStorageService().deleteCredentials();
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
@@ -75,4 +77,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

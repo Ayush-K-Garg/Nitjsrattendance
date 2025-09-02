@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:attend/models/attendance_record.dart';
+import 'package:attend/models/scraped_data.dart'; // Using the new Course model
 
 class AttendanceCard extends StatelessWidget {
-  final AttendanceRecord record;
-  const AttendanceCard({super.key, required this.record});
+  final Course course; // Changed from AttendanceRecord to Course
+  const AttendanceCard({super.key, required this.course});
 
   Color _getPercentageColor(double percentage) {
     if (percentage >= 75) return const Color(0xFF2ECC71); // Green
@@ -13,7 +13,8 @@ class AttendanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final percentageColor = _getPercentageColor(record.percentage);
+    // The percentage is now calculated via the getter in the Course model
+    final percentageColor = _getPercentageColor(course.percentage);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       color: Theme.of(context).colorScheme.surface,
@@ -26,11 +27,28 @@ class AttendanceCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(record.subjectName, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 4),
-                  Text(record.subjectCode, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+                  Text(course.subjectName, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 8),
+
+                  // --- THIS IS THE FIX ---
+                  // Added a row to display the faculty name with an icon
+                  Row(
+                    children: [
+                      Icon(Icons.person_outline, size: 14, color: Colors.grey[400]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          course.facultyName,
+                          style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // --- END OF FIX ---
+
                   const SizedBox(height: 12),
-                  Text('Attended: ${record.classesAttended} of ${record.totalClasses}', style: TextStyle(color: Colors.grey[300], fontSize: 14)),
+                  Text('Attended: ${course.classesAttended} of ${course.totalClasses}', style: TextStyle(color: Colors.grey[300], fontSize: 14)),
                 ],
               ),
             ),
@@ -42,13 +60,13 @@ class AttendanceCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   CircularProgressIndicator(
-                    value: record.percentage / 100,
+                    value: course.percentage / 100,
                     strokeWidth: 6,
                     backgroundColor: Colors.grey.withOpacity(0.2),
                     valueColor: AlwaysStoppedAnimation<Color>(percentageColor),
                   ),
                   Center(
-                    child: Text('${record.percentage.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: percentageColor)),
+                    child: Text('${course.percentage.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: percentageColor)),
                   ),
                 ],
               ),

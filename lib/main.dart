@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'NIT JSR Portal',
+
       theme: darkTheme,
       debugShowCheckedModeBanner: false,
       home: const AuthCheckScreen(),
