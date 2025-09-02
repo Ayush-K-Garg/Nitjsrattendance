@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import 'package:attend/screens/attendance_screen.dart';
+import 'package:attend/screens/login_screen.dart';
+import 'package:attend/screens/result_screen.dart';
+import 'package:attend/services/secure_storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class HomeScreen extends StatefulWidget {
+  // No longer needs to accept credentials
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  // The pages are now created without passing credentials
+  final List<Widget> _pages = const [
+    AttendanceScreen(),
+    ResultScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
+  void _logout() async {
+    // Clear credentials and cache
+    await SecureStorageService().clearCredentials();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    // Navigate to LoginScreen and remove all previous routes
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()), (route) => false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_selectedIndex == 0 ? 'My Attendance' : 'My Results'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.checklist_rtl_outlined),
+            activeIcon: Icon(Icons.checklist_rtl),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school_outlined),
+            activeIcon: Icon(Icons.school),
+            label: 'Results',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
