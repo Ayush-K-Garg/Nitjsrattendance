@@ -80,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Spacer(),
+                    Image.asset('assets/nitlogo.png'),
                     Text(
                       'Welcome Back',
                       textAlign: TextAlign.center,

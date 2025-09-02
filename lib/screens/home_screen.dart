@@ -43,36 +43,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_selectedIndex == 0 ? 'My Attendance' : 'My Results'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-            tooltip: 'Logout',
+    return SafeArea(
+      child: Scaffold(
+
+        appBar: AppBar(
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: const Color(0xFFFFFFFF), // Prevents default color fill
+              child: ClipOval(
+                child: Image.asset(
+                  "assets/nitlogo.png",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
           ),
-        ],
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.checklist_rtl_outlined),
-            activeIcon: Icon(Icons.checklist_rtl),
-            label: 'Attendance',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school_outlined),
-            activeIcon: Icon(Icons.school),
-            label: 'Results',
-          ),
-        ],
+      
+          title: Text(_selectedIndex == 0 ? 'My Attendance' : 'My Results'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: _logout,
+              tooltip: 'Logout',
+            ),
+          ],
+        ),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.checklist_rtl_outlined),
+              activeIcon: Icon(Icons.checklist_rtl),
+              label: 'Attendance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.school_outlined),
+              activeIcon: Icon(Icons.school),
+              label: 'Results',
+            ),
+          ],
+        ),
       ),
     );
   }
