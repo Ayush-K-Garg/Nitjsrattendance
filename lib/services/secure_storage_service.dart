@@ -20,8 +20,7 @@ class SecureStorageService {
     return null;
   }
 
-  // --- RENAMED THIS METHOD ---
-  // The method now matches the call in login_screen.dart
+
   Future<void> deleteCredentials() async {
     await _storage.deleteAll();
   }
