@@ -8,19 +8,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:attend/models/result_record.dart';
 
 class WebScrapingService {
-  // --- ATTENDANCE PORTAL VALUES ---
   final String _loginUrl = 'https://online.nitjsr.ac.in/sap/Login.aspx';
   final String _homeUrl = 'https://online.nitjsr.ac.in/sap/Home/Home.aspx';
   final String _attendanceUrl = 'https://online.nitjsr.ac.in/sap/StudentAttendance/ClassAttendance.aspx';
 
-  // --- HTML Element IDs ---
   final String _usernameFieldId = 'txtuser_id';
   final String _passwordFieldId = 'txtpassword';
   final String _loginButtonId = 'btnsubmit';
-  final String _studentNameId = 'lbluser'; // The correct, reliable ID for the welcome message
+  final String _studentNameId = 'lbluser'; 
   final String _attendanceTableId = 'ContentPlaceHolder1_gv';
 
-  // --- CACHING SETUP ---
   static const String _cacheKey = 'scraped_data_cache';
   static const String _timestampKey = 'scraped_data_timestamp';
   final Duration _cacheDuration = const Duration(hours: 4);
@@ -97,13 +94,11 @@ class WebScrapingService {
             String? attendanceHtml = await controller.getHtml();
             if (attendanceHtml == null) throw Exception("Failed to get attendance page HTML.");
 
-            // --- HTML LOGGING REMAINS ACTIVE FOR DEBUGGING ---
             if (kDebugMode) {
               debugPrint("--- ATTENDANCE PAGE HTML START ---");
               debugPrint(attendanceHtml);
               debugPrint("--- ATTENDANCE PAGE HTML END ---");
             }
-            // ---------------------------------------------------
 
             courseDetails = _parseAttendanceHtml(attendanceHtml);
 
@@ -141,14 +136,12 @@ class WebScrapingService {
     }
   }
 
-  // Uses the reliable 'lbluser' ID and cleans the "Welcome " prefix.
   Student _parseStudentDetailsHtml(String htmlString, String registrationNumber) {
     final document = parser.parse(htmlString);
     final nameElement = document.getElementById(_studentNameId);
 
     if (nameElement != null) {
       String fullName = nameElement.text.trim();
-      // Remove the "Welcome " part to get just the name.
       String name = fullName.replaceFirst('Welcome ', '');
       return Student(name: name, regNo: registrationNumber);
     }
@@ -157,7 +150,6 @@ class WebScrapingService {
   }
 
 
-  // This function now uses the correct column indices based on the HTML log.
   List<Course> _parseAttendanceHtml(String htmlString) {
     final document = parser.parse(htmlString);
     final List<Course> courses = [];
@@ -168,17 +160,14 @@ class WebScrapingService {
     }
 
     final rows = table.querySelectorAll('tr');
-    // Start from 1 to skip the header row.
     for (var i = 1; i < rows.length; i++) {
       final cells = rows[i].querySelectorAll('td');
-      if (cells.length >= 7) { // Check there are enough columns
+      if (cells.length >= 7) { 
         try {
-          // --- THIS IS THE FINAL FIX ---
-          final subjectCode = cells[1].text.trim();      // Column 2
-          final subjectName = cells[2].text.trim();      // Column 3
-          final facultyName = cells[3].text.trim();      // Column 4
-          final attendanceText = cells[4].text.trim(); // Column 5
-          // --- END OF FIX ---
+          final subjectCode = cells[1].text.trim();     
+          final subjectName = cells[2].text.trim();      
+          final facultyName = cells[3].text.trim();     
+          final attendanceText = cells[4].text.trim(); 
 
           final parts = attendanceText.split('/');
 
